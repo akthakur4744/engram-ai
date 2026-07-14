@@ -1,0 +1,20 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# env
+.env
+.env.local
+.env*.local
+
+# next.js
+apps/web/.next/
+apps/web/out/
+
+# build output
+dist/
+*.tsbuildinfo
+
+# misc
+.DS_Store
+*.log
