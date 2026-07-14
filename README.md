@@ -55,7 +55,7 @@ engineering-memory/
 
 Every capability lives in `packages/rag` and is called from the Next.js routes today — and (Milestone 4) from an MCP server tomorrow, unchanged. The provider interfaces mean any single backend swaps without the pipeline noticing; `ragFromEnv()` is the _only_ place the concrete Gemini/Supabase/Claude choices are named.
 
-**Two-tier Claude** keeps costs down: `claude-haiku-4-5` for the cheap prep calls (deriving a query, reflecting), `claude-opus-4-8` for the user-facing review.
+**Two-tier Claude** keeps costs down: `claude-haiku-4-5` for the cheap prep calls (deriving a query, reflecting), `claude-sonnet-4-6` for the user-facing review.
 
 ---
 

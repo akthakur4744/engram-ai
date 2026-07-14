@@ -35,4 +35,4 @@ Embeddings are for search; the LLM is for reasoning. They never touch each other
 ## Two-tier Claude
 
 - `claude-haiku-4-5` — cheap prep calls (derive query, reflect)
-- `claude-opus-4-8` — user-facing review and answers
+- `claude-sonnet-4-6` — user-facing review and answers

@@ -5,7 +5,7 @@ import type { ChatMessage, LLMOpts } from "@em/shared";
  *
  * `rag` talks only to this interface, so Claude can be swapped for another model
  * without touching the pipeline. The `model` option on each call lets one provider
- * instance serve BOTH tiers (cheap haiku for prep calls, opus for the final answer).
+ * instance serve BOTH tiers (cheap haiku for prep calls, sonnet for the final answer).
  */
 export interface LLMProvider {
   /** One-shot completion. */
@@ -20,5 +20,5 @@ export const Models = {
   /** Cheap + fast: query derivation, categorization, reflection proposals. */
   cheap: "claude-haiku-4-5",
   /** High quality: the user-facing review / answer. */
-  quality: "claude-opus-4-8",
+  quality: "claude-sonnet-4-6",
 } as const;
