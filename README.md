@@ -21,6 +21,26 @@ The seeded memory already contains _"Don't derive state with useEffect"_, so the
 
 ## How RAG works here (the mental model)
 
+```mermaid
+flowchart LR
+    U(["You"]) -->|"diff or question"| WEB["Web UI (/review)"]
+    U -->|"diff or question"| MCP["MCP tools<br/>(Cursor / Claude Desktop)"]
+
+    WEB --> CORE["RAG Core<br/>packages/rag"]
+    MCP --> CORE
+
+    CORE -->|"1. embed query"| EMB["Embeddings<br/>(Gemini)"]
+    EMB -->|"2. vector search"| STORE[("Vector Store<br/>Supabase + pgvector")]
+    STORE -->|"3. relevant observations"| CORE
+
+    CORE -->|"4. generate, citing sources"| LLM["LLM<br/>(Claude, two-tier)"]
+    LLM -->|"cited review / answer"| WEB
+
+    LLM -->|"5. propose new observations"| GATE{"You approve?"}
+    GATE -->|"yes"| STORE
+    GATE -->|"no"| DROP(["discarded"])
+```
+
 Two independent paths meet at one store: observation text is embedded and written to pgvector on the WRITE side; a diff or question is turned into a query, embedded, and matched against that same store by cosine similarity on the READ side. Key idea: **embeddings are for search, the LLM is for reasoning, and they never touch each other** — the LLM only ever sees retrieved _text_, never a vector. Anthropic ships no embedding model on purpose — pairing Claude (generation) with Gemini (embeddings) is the standard production pattern, and it's exactly what the `EmbeddingProvider` / `LLMProvider` interfaces encode.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#system-overview) for the full diagram and the provider interfaces that encode this.
