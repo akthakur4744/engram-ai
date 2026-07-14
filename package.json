@@ -2,7 +2,7 @@
   "name": "engram-ai",
   "version": "0.1.0",
   "private": true,
-  "description": "Engram AI — a RAG + Agent Culture POC: a shared engineering-knowledge substrate that agents read AND write.",
+  "description": "Engram AI — a RAG + Agent Culture system: a shared engineering-knowledge substrate that agents read AND write.",
   "packageManager": "pnpm@10.33.2",
   "scripts": {
     "dev": "pnpm --filter @em/web dev",

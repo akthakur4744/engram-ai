@@ -46,7 +46,7 @@ export class GeminiEmbeddingProvider implements EmbeddingProvider {
 /**
  * When embedding a *query* (vs a stored document), Gemini quality improves if you tag
  * it as a query. Left as a learning hook — asymmetric query/document embeddings are a
- * real retrieval-quality lever; the POC uses the document-side embedding for both.
+ * real retrieval-quality lever; this implementation uses the document-side embedding for both.
  */
 export async function embedQuery(
   provider: GeminiEmbeddingProvider,

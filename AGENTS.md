@@ -4,7 +4,9 @@ Cross-tool harness context for agents (Cursor, Claude Code, etc.) working in thi
 
 ## What this project is
 
-A RAG + Agent Culture POC: engineers contribute distilled observations; every code review, Q&A, or PR analysis retrieves and cites them. The **reflector** write-back loop is the differentiator — the system learns from approved observations.
+A RAG + Agent Culture system: engineers contribute distilled observations; every code review, Q&A, or PR analysis retrieves and cites them. The **reflector** write-back loop is the differentiator — the system learns from approved observations.
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full system diagrams and data/control flow, and [docs/LEARNINGS.md](docs/LEARNINGS.md) for the engineering decisions behind them.
 
 ## Monorepo layout
 
@@ -17,7 +19,7 @@ engram-ai/
 │   ├── shared/           Domain types (Observation, Retrieved, MetadataFilter)
 │   ├── embeddings/       EmbeddingProvider + GeminiEmbeddingProvider
 │   ├── vectorstore/      VectorStore + SupabaseVectorStore + schema.sql
-│   ├── llm/              LLMProvider + ClaudeLLMProvider (haiku + opus tiers)
+│   ├── llm/              LLMProvider + ClaudeLLMProvider (haiku + sonnet tiers)
 │   └── rag/              THE CORE: reviewDiff · ask · reflect · addObservation
 ├── .claude/
 │   ├── rules/            Declarative constraints (architecture, types, security)

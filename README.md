@@ -1,8 +1,8 @@
 # Engram AI
 
-> A RAG-plus-culture system: engineers (or agents) contribute distilled observations, and every future code review, Q&A, or PR analysis retrieves and cites them. Corrections propagate — the system learns. Built as a POC over my own React/Node repos so the architecture can be validated without touching company code.
+> A RAG-plus-culture system: engineers (or agents) contribute distilled observations, and every future code review, Q&A, or PR analysis retrieves and cites them. Corrections propagate — the system learns.
 
-This is a learning project inspired by the "Agent Culture" idea — AI systems that share a persistent, editable knowledge substrate they both **read from** and **write to**. That write-back loop (the _reflector_) is the differentiator over generic "chat with your docs" RAG.
+Engram AI is built around the "Agent Culture" idea — AI systems that share a persistent, editable knowledge substrate they both **read from** and **write to**. That write-back loop (the _reflector_) is the differentiator over generic "chat with your docs" RAG.
 
 *An [engram](https://en.wikipedia.org/wiki/Engram_(neuropsychology)) is a neuroscience term for a memory trace stored in the brain — exactly what the `observations` table is.*
 
@@ -21,41 +21,32 @@ The seeded memory already contains _"Don't derive state with useEffect"_, so the
 
 ## How RAG works here (the mental model)
 
-```
-        WRITE side                              READ side
-  ┌───────────────────┐               ┌──────────────────────────┐
-  observation text     │              │  diff / question          │
-        │ embed (Gemini)│              │       │ derive query (Claude haiku)
-        ▼               │              │       ▼ embed (Gemini)
-   vector(768) ─────────┼── pgvector ──┼──▶ kNN search (cosine) ──▶ top-K text
-        │               │  (Supabase)  │                              │
-   metadata cols        │              │                              ▼
-   (type, technology…) ─┘              │              answer/review (Claude opus)
-                                       │                cites retrieved text  [#n]
-                                       └──────────────────────────┘
-```
+Two independent paths meet at one store: observation text is embedded and written to pgvector on the WRITE side; a diff or question is turned into a query, embedded, and matched against that same store by cosine similarity on the READ side. Key idea: **embeddings are for search, the LLM is for reasoning, and they never touch each other** — the LLM only ever sees retrieved _text_, never a vector. Anthropic ships no embedding model on purpose — pairing Claude (generation) with Gemini (embeddings) is the standard production pattern, and it's exactly what the `EmbeddingProvider` / `LLMProvider` interfaces encode.
 
-Key idea: **embeddings are for search, the LLM is for reasoning, and they never touch each other.** The LLM only ever sees retrieved _text_, never a vector. Anthropic ships no embedding model on purpose — pairing Claude (generation) with Gemini (embeddings) is the standard production pattern, and it's exactly what the `EmbeddingProvider` / `LLMProvider` interfaces encode.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#system-overview) for the full diagram and the provider interfaces that encode this.
 
 ---
 
 ## Architecture — one core, many interfaces
 
 ```
-engineering-memory/
+engram-ai/
 ├── apps/
-│   └── web/            Next.js 15 — UI (/review) + API routes (thin wrappers over the core)
+│   ├── web/            Next.js 15 — UI (/review) + API routes (thin wrappers over the core)
+│   └── mcp-server/     MCP server exposing the same core as tools
 ├── packages/
 │   ├── shared/         domain types every package agrees on (Observation, Retrieved…)
 │   ├── embeddings/     EmbeddingProvider interface + GeminiEmbeddingProvider
 │   ├── vectorstore/    VectorStore interface + SupabaseVectorStore + schema.sql
-│   ├── llm/            LLMProvider interface + ClaudeLLMProvider (haiku + opus tiers)
+│   ├── llm/            LLMProvider interface + ClaudeLLMProvider (haiku + sonnet tiers)
 │   └── rag/            THE CORE: reviewDiff · ask · reflect · addObservation + the seeder
 ```
 
-Every capability lives in `packages/rag` and is called from the Next.js routes today — and (Milestone 4) from an MCP server tomorrow, unchanged. The provider interfaces mean any single backend swaps without the pipeline noticing; `ragFromEnv()` is the _only_ place the concrete Gemini/Supabase/Claude choices are named.
+Every capability lives in `packages/rag` and is called identically from the Next.js routes and the MCP server. The provider interfaces mean any single backend swaps without the pipeline noticing; `ragFromEnv()` is the _only_ place the concrete Gemini/Supabase/Claude choices are named.
 
 **Two-tier Claude** keeps costs down: `claude-haiku-4-5` for the cheap prep calls (deriving a query, reflecting), `claude-sonnet-4-6` for the user-facing review.
+
+Full component diagram, sequence diagrams, and the DB schema are in **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
 
 ---
 
@@ -113,6 +104,8 @@ pnpm dev         # http://localhost:3000  → open /review
 ---
 
 ## Where to start reading the code
+
+For the full architecture (diagrams, data flow, schema), see **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — and **[docs/LEARNINGS.md](docs/LEARNINGS.md)** for the engineering decisions and gotchas behind them. To start reading code directly:
 
 1. [`packages/shared/src/types.ts`](packages/shared/src/types.ts) — the vocabulary.
 2. [`packages/rag/src/reviewDiff.ts`](packages/rag/src/reviewDiff.ts) — the full read→reason→reflect pipeline in ~60 lines.
