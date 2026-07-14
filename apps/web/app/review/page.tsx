@@ -20,10 +20,16 @@ const SAMPLE_DIFF = `--- a/src/components/TransactionList.tsx
 +  }, [transactions, query]);
 `;
 
+type ReviewResultWithTruncation = ReviewResult & { truncated?: boolean };
+
+type Mode = "pr" | "diff";
+
 export default function ReviewPage() {
+  const [mode, setMode] = useState<Mode>("pr");
+  const [prUrl, setPrUrl] = useState("");
   const [diff, setDiff] = useState(SAMPLE_DIFF);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<ReviewResult | null>(null);
+  const [result, setResult] = useState<ReviewResultWithTruncation | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function runReview() {
@@ -31,14 +37,16 @@ export default function ReviewPage() {
     setError(null);
     setResult(null);
     try {
-      const res = await fetch("/api/review", {
+      const [url, body] =
+        mode === "pr" ? ["/api/github/review", { prUrl }] : ["/api/review", { diff }];
+      const res = await fetch(url, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ diff }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "review failed");
-      setResult(data as ReviewResult);
+      setResult(data as ReviewResultWithTruncation);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -50,20 +58,48 @@ export default function ReviewPage() {
     <main className="wrap">
       <h1>Reviewer</h1>
       <p className="sub">
-        Paste a diff. The reviewer retrieves observations from the shared memory, cites them
-        as [#n], then proposes new ones to remember. <a href="/">← home</a>
+        Paste a GitHub PR link (public repos only) or a raw diff. The reviewer retrieves
+        observations from the shared memory, cites them as [#n], then proposes new ones to
+        remember. <a href="/">← home</a>
       </p>
 
       <div className="grid">
         <div>
-          <textarea value={diff} onChange={(e) => setDiff(e.target.value)} />
+          <div className="row" style={{ marginBottom: 12 }}>
+            <button className={mode === "pr" ? "" : "ghost"} onClick={() => setMode("pr")}>
+              PR link
+            </button>
+            <button className={mode === "diff" ? "" : "ghost"} onClick={() => setMode("diff")}>
+              Paste diff
+            </button>
+          </div>
+
+          {mode === "pr" ? (
+            <input
+              className="input"
+              type="text"
+              placeholder="https://github.com/owner/repo/pull/123"
+              value={prUrl}
+              onChange={(e) => setPrUrl(e.target.value)}
+            />
+          ) : (
+            <textarea value={diff} onChange={(e) => setDiff(e.target.value)} />
+          )}
+
           <div style={{ marginTop: 12 }}>
-            <button onClick={runReview} disabled={loading}>
-              {loading ? "Reviewing…" : "Review diff"}
+            <button onClick={runReview} disabled={loading || (mode === "pr" && !prUrl.trim())}>
+              {loading ? "Reviewing…" : mode === "pr" ? "Review PR" : "Review diff"}
             </button>
           </div>
 
           {error && <p style={{ color: "#f87171" }}>Error: {error}</p>}
+
+          {result?.truncated && (
+            <p style={{ color: "#fbbf24" }}>
+              Large PR — only the first ~12,000 characters were reviewed; some files may not have
+              been seen.
+            </p>
+          )}
 
           {result && (
             <div className="panel" style={{ marginTop: 20 }}>

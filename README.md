@@ -8,6 +8,42 @@ Engram AI is built around the "Agent Culture" idea — AI systems that share a p
 
 ---
 
+## Screenshots
+
+What it actually looks like to use — a Next.js UI at `/review` with two ways in (a GitHub PR link or a pasted diff), both landing on the same cited review + culture-loop panel.
+
+<table>
+<tr>
+<td width="50%">
+<img src="docs/screenshots/home.png" alt="Home page"/>
+<br/><sub><b>Home.</b> One paragraph explaining the culture loop, one link into the Reviewer — no dashboard to learn first.</sub>
+</td>
+<td width="50%">
+<img src="docs/screenshots/review-pr-link.png" alt="Paste a GitHub PR link"/>
+<br/><sub><b>PR-link mode (default).</b> Paste a public GitHub PR URL (or the <code>owner/repo#123</code> shorthand) — no token, no OAuth, nothing to configure. Public repos only, by design, for now.</sub>
+</td>
+</tr>
+<tr>
+<td width="50%">
+<img src="docs/screenshots/review-paste-diff.png" alt="Paste a raw diff"/>
+<br/><sub><b>Diff-paste mode.</b> No real PR handy? Paste any unified diff directly. Same backend pipeline either way — the UI just swaps how the diff string gets sourced.</sub>
+</td>
+<td width="50%">
+<img src="docs/screenshots/review-pr-result.png" alt="Review of a real PR" />
+<br/><sub><b>A live PR, reviewed.</b> This is <code>octocat/Hello-World#1</code>, fetched straight from the GitHub API and reviewed in real time — not a canned example.</sub>
+</td>
+</tr>
+</table>
+
+<img src="docs/screenshots/review-diff-result.png" alt="Full review with citations, why-retrieved panel, and reflector proposals" width="100%"/>
+
+**The full loop, in one screenshot:**
+- **Left — the review.** Written by Claude, and every claim that's backed by prior team knowledge is cited inline as `[#n]`, not just asserted.
+- **Top right — "Why retrieved."** The exact observations pulled from the shared memory for this diff, each with its similarity score. Retrieval is never a black box here.
+- **Bottom right — "Reflector."** New observations the system distilled from *this* diff, proposed for you to save. Click **Save** and the next similar diff will retrieve them too — that write-back is what turns this from "chat with your code" into a memory that compounds.
+
+---
+
 ## The one demo that explains everything
 
 1. Paste a git diff into **/review**.
