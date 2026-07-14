@@ -8,7 +8,9 @@
     "dev": "pnpm --filter @em/web dev",
     "build": "pnpm --filter @em/web build",
     "seed": "pnpm --filter @em/rag seed",
-    "typecheck": "pnpm -r --parallel typecheck"
+    "typecheck": "pnpm -r --parallel typecheck",
+    "verify": "bash scripts/verify.sh",
+    "mcp": "pnpm --filter @em/mcp-server start"
   },
   "engines": {
     "node": ">=20"

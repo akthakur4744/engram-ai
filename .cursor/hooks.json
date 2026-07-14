@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": ".claude/hooks/post-edit-typecheck.sh",
+        "timeout": 120
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": ".claude/hooks/guard-secrets.sh",
+        "matcher": "git commit",
+        "timeout": 10
+      }
+    ]
+  }
+}

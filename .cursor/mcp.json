@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "engram-ai": {
+      "command": "pnpm",
+      "args": ["--filter", "@em/mcp-server", "dev"],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}
