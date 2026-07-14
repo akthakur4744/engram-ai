@@ -25,7 +25,7 @@ export async function reflect(rag: Rag, turn: Interaction): Promise<ObservationI
       { role: "system", content: REFLECT_SYSTEM },
       { role: "user", content: renderTurn(turn) },
     ],
-    { model: Models.cheap, maxTokens: 700, temperature: 0.2 },
+    { model: Models.cheap, maxTokens: 700 },
   );
   return parseProposals(raw);
 }

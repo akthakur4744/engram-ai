@@ -27,7 +27,6 @@ export class ClaudeLLMProvider implements LLMProvider {
     const res = await this.#client.messages.create({
       model: opts.model ?? this.#defaultModel,
       max_tokens: opts.maxTokens ?? 1024,
-      temperature: opts.temperature ?? 0.3,
       system,
       messages: turns,
     });
@@ -43,7 +42,6 @@ export class ClaudeLLMProvider implements LLMProvider {
     const s = this.#client.messages.stream({
       model: opts.model ?? this.#defaultModel,
       max_tokens: opts.maxTokens ?? 1024,
-      temperature: opts.temperature ?? 0.3,
       system,
       messages: turns,
     });

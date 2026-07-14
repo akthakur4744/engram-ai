@@ -77,7 +77,6 @@ export interface LLMOpts {
   /** Overrides the provider's default model for this one call (e.g. use haiku for a cheap prep call). */
   model?: string;
   maxTokens?: number;
-  temperature?: number;
 }
 
 /** The result of a Review turn, ready to render. */

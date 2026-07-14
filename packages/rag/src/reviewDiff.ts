@@ -63,7 +63,7 @@ async function deriveQuery(rag: Rag, diff: string): Promise<string> {
       },
       { role: "user", content: truncate(diff, 6000) },
     ],
-    { model: Models.cheap, maxTokens: 40, temperature: 0 },
+    { model: Models.cheap, maxTokens: 40 },
   );
   return q.trim();
 }
